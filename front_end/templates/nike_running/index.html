@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Nike Running</title>
+    <link rel="stylesheet" href="{% static "css/mystyle.css" %}">
+  </head>
+  <body>
+    <!-- <h1>Nike Running Tracking System</h1> -->
+    <img src="{% static "images/nike_running.jpeg" %}" alt="Image didn't show">
+    <div id="map"></div>
+    <button type="button" id="configure" disabled onclick="handleConfigure()">Running Configuration</button>
+    <button type="button" id="clear" disabled onclick="handleClear()">Clear</button>
+    <script src="{% static "js/map.js" %}"></script>
+    <script src="{% static "js/simulate.js" %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKnUESEafvEH2MxWXOlu42WeTxhuuw4FI&callback=initMap"></script>
+  </body>
+</html>

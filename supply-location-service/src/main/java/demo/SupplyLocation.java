@@ -41,9 +41,8 @@ public class SupplyLocation {
     private String address2;
     private String city;
     @JsonIgnore
-    private final
     @GeoSpatialIndexed
-    Point location;
+    private final Point location;
     private String state;
     private String zip;
     private String type;

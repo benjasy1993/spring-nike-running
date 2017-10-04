@@ -1,2 +1,8 @@
+*.pyc
 *.iml
 .idea/
+platform/eureka/target/
+running-location-distribution/target/
+running-location-simulator/target/
+running-location-updater/target/
+front_end/db.sqlite3

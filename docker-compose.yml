@@ -3,3 +3,10 @@ rabbitmq:
   ports:
     - "5672:5672"
     - "15672:15672"
+mysql:
+  image: mysql:5.6
+  environment:
+    MYSQL_ROOT_PASSWORD: "root"
+    MYSQL_DATABASE: "runningInfoAnalysis_db"
+  ports:
+    - "3306:3306"
