@@ -8,9 +8,12 @@ import demo.service.GpsSimulatorFactory;
 import demo.service.PathService;
 import demo.task.LocationSimulator;
 import demo.task.LocationSimulatorInstance;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ import java.util.concurrent.Future;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class LocationSimulatorRestApi {
 
     @Autowired
@@ -43,10 +47,11 @@ public class LocationSimulatorRestApi {
     //2. Transform domain model simulator request to a class that can be executed by taskExecutor
     //3. taskExecutor.submit(simulator);
     //4. simulation starts
-    @RequestMapping("/simulation")
-    public List<LocationSimulatorInstance> simulation() {
-        final SimulatorInitLocations fixture = this.pathService.loadSimulatorFixture();
-
+    @RequestMapping(value = "/simulation", method = RequestMethod.POST)
+    public List<LocationSimulatorInstance> simulation(@RequestBody SimulatorInitLocations fixture) {
+//        final SimulatorInitLocations fixture = this.pathService.loadSimulatorFixture();
+        log.info(fixture.toString());
+        log.info("number of requests: " + fixture.getNumberOfGpsSimulatorRequests());
         final List<LocationSimulatorInstance> instances = new ArrayList<>();
         final List<Point> lookAtPoints = new ArrayList<>();
 

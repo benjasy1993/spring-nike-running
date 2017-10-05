@@ -6,6 +6,9 @@
     <meta charset="utf-8">
     <title>Nike Running</title>
     <link rel="stylesheet" href="{% static "css/mystyle.css" %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
   </head>
   <body>
     <!-- <h1>Nike Running Tracking System</h1> -->
@@ -13,8 +16,16 @@
     <div id="map"></div>
     <button type="button" id="configure" disabled onclick="handleConfigure()">Running Configuration</button>
     <button type="button" id="clear" disabled onclick="handleClear()">Clear</button>
+
+    <div class="container">
+      <form action="/simulate" target="_blank" method="post">
+        {{ form.as_p}}
+        {% csrf_token %}
+        <input type="submit" onclick="connect()" value="Submit">
+      </form>
+    </div>
     <script src="{% static "js/map.js" %}"></script>
-    <script src="{% static "js/simulate.js" %}"></script>
+    <!-- <script src="{% static "js/simulate.js" %}"></script> -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKnUESEafvEH2MxWXOlu42WeTxhuuw4FI&callback=initMap"></script>
   </body>
 </html>

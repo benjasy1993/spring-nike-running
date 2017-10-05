@@ -3,14 +3,24 @@ var start, end;
 var startMarker, endMarker;
 var polyline;
 var directionsDisplay, directionsService;
-
+var directionsResult;
+var runners;
+var connect;
+var stompClient = null;
+const SOCKET_ENDPOINT = 'http://localhost:9007'
 function initMap() {
   //set up directions service and display
   directionsDisplay = new google.maps.DirectionsRenderer({
     draggable: true,
     suppressMarkers: true
   });
+  directionsDisplay.addListener('directions_changed', function() {
+    directionsResult = directionsDisplay.getDirections();
+  });
   directionsService = new google.maps.DirectionsService;
+  if (!runners) {
+    runners = new Map();
+  }
 
   infoWindow = new google.maps.InfoWindow;
   map = new google.maps.Map(document.getElementById('map'), {
@@ -59,7 +69,7 @@ function initMap() {
     }
 
     if (start && end) {
-      if (!polyline) {
+      if (!directionsResult) {
         calcRoute(start, end, directionsDisplay, directionsService);
         if (directionsDisplay.getMap() == null) {
           directionsDisplay.setMap(map);
@@ -67,15 +77,47 @@ function initMap() {
       }
       document.getElementById('configure').disabled = false;
     }
-
     if (start == null || end == null) {
       document.getElementById('configure').disabled = true;
     }
-
     if (start != null || end != null) {
       document.getElementById('clear').disabled = false;
     }
   });
+
+  if (!connect) {
+    connect = function() {
+        var socket = new SockJS(SOCKET_ENDPOINT+'/stomp');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            // setConnected(true);
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/locations', function (greeting) {
+                // a js object that contains all running data
+                var data = JSON.parse(greeting.body);
+                var runningId = data['runningId'];
+                console.log(typeof data['location']['latitude']);
+                var location = new google.maps.LatLng({
+                  lat: data['location']['latitude'],
+                  lng: data['location']['longitude']
+                });
+                if (runners.has(runningId)) {
+                  runners.get(runningId).setPosition(location);
+                } else {
+                  runners.set(runningId, new google.maps.Marker({
+                      icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 5
+                      },
+                      title: 'you',
+                      position: location,
+                      map: map
+                  }));
+                }
+            });
+        });
+    }
+  }
 
 }
 
@@ -96,7 +138,6 @@ function calcRoute(start, end, directionsDisplay, directionsService) {
   directionsService.route(request, function(result, status) {
     if (status == 'OK') {
       directionsDisplay.setDirections(result);
-      polyline = result["routes"][0]["overview_polyline"];
       console.log(result);
     }
   });
@@ -106,7 +147,7 @@ function handleClear() {
   //clear directionsDisplay view and start and end points
   start = null;
   end = null;
-  polyline = null;
+  directionsResult = null;
   if (startMarker) {
     startMarker.setMap(null);
   }
@@ -118,4 +159,9 @@ function handleClear() {
   }
   document.getElementById('clear').disabled = true;
   document.getElementById('configure').disabled = true;
+}
+
+function handleConfigure() {
+  polyline = directionsResult["routes"][0]["overview_polyline"];
+  document.getElementById('polyline').value = polyline;
 }
